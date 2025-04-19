@@ -1,0 +1,3 @@
+# This file exists so that Git will track the uploads directory,
+# but not track any of its contents.
+# This ensures the uploads directory is created when cloning the repository. 
