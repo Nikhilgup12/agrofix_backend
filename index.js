@@ -18,7 +18,12 @@ const connectDB = require("./config/db");
 
 // Update CORS configuration to allow credentials and specific origins
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  origin: [
+    'http://localhost:3000', 
+    'http://localhost:3001',
+    'https://agrofix-frontend-five.vercel.app',
+    'https://agrofix-frontend.vercel.app'
+  ],
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -39,10 +44,19 @@ if (!fs.existsSync("./uploads")) {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
 // Serve static files from uploads directory with proper CORS headers
 app.use("/uploads", (req, res, next) => {
-  // Add CORS headers
-  res.header("Access-Control-Allow-Origin", corsOptions.origin);
+  // Add CORS headers for all origins in corsOptions
+  const requestOrigin = req.headers.origin;
+  if (corsOptions.origin.includes(requestOrigin) || corsOptions.origin === '*') {
+    res.header("Access-Control-Allow-Origin", requestOrigin);
+  } else {
+    // For requests without origin header, allow all
+    res.header("Access-Control-Allow-Origin", "*");
+  }
   res.header("Access-Control-Allow-Methods", "GET");
   res.header("Cache-Control", "public, max-age=3600"); // Cache for 1 hour
   next();
